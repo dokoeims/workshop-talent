@@ -31,28 +31,31 @@ function App() {
   }, [])
 
   useEffect(() => {
-    console.log('availableBooks', availableBooks)
-  }, [availableBooks])
-  
-
-  useEffect(() => {
     if(booksOptions.length > 0)
       setSelectedBook(booksOptions[0].value)
   }, [booksOptions])
   
   useEffect(() => {
+    let interval
+
     async function fetchOrderBook(){
       const data = await fetchOrderBookData(`${API.ROOT}${API.ENDPOINTS.ORDER_BOOK}`, selectedBook)
-      console.log('Book: ', data)
+      
       if(!isEmpty(data))
         setOrderBook(data.payload)
     }
 
-    if(selectedBook)
+    if(selectedBook){
       fetchOrderBook()
+      interval = setInterval(fetchOrderBook, 2000)
+    }
+
+    return () => {
+      clearInterval(interval)
+      setOrderBook({})
+    }
   
   }, [selectedBook])
-  
 
   return (
     <Box sx={styles.container}>
@@ -72,7 +75,7 @@ function App() {
         </Select>
       </FormControl>
 
-      { !isEmpty(orderBook) && <Table data={orderBook} /> }
+      <Table data={orderBook} />
       
     </Box>
   )

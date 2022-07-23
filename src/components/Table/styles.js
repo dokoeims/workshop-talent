@@ -2,6 +2,12 @@ export const styles = {
     table: {
         minWidth: 650
     },
+    head: {
+        height: '6rem'
+    },
+    title: {
+        fontSize: '4rem'
+    },
     tableRow: {
         '&:last-child td, &:last-child th': { border: 0 }
     },
