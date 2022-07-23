@@ -1,28 +1,39 @@
 import { useEffect, useState } from 'react'
 import { isEmpty } from 'lodash'
 
+import { Box, FormControl, InputLabel, Select, MenuItem } from '@mui/material'
+import Table from './components/Table'
+
 import { fetchData, fetchOrderBookData } from './api'
 import { API } from './constants'
 import { getBooksOptions } from './helpers'
 import { styles } from './styles'
 
-import { Box, FormControl, InputLabel, Select, MenuItem } from '@mui/material'
 
 function App() {
+  const [availableBooks, setAvailableBooks] = useState([])
   const [booksOptions, setBooksOptions] = useState([])
   const [selectedBook, setSelectedBook] = useState('')
+  const [orderBook, setOrderBook] = useState({})
 
   useEffect(() => {
     async function fetchBooksData(){
       const data = await fetchData(`${API.ROOT}${API.ENDPOINTS.AVAILABLE_BOOKS}`)
 
-      if(!isEmpty(data))
+      if(!isEmpty(data)){
+        setAvailableBooks(data.payload)
         setBooksOptions(getBooksOptions(data))
+      }
     }
     
     fetchBooksData()
     
   }, [])
+
+  useEffect(() => {
+    console.log('availableBooks', availableBooks)
+  }, [availableBooks])
+  
 
   useEffect(() => {
     if(booksOptions.length > 0)
@@ -33,6 +44,8 @@ function App() {
     async function fetchOrderBook(){
       const data = await fetchOrderBookData(`${API.ROOT}${API.ENDPOINTS.ORDER_BOOK}`, selectedBook)
       console.log('Book: ', data)
+      if(!isEmpty(data))
+        setOrderBook(data.payload)
     }
 
     if(selectedBook)
@@ -58,6 +71,8 @@ function App() {
           }
         </Select>
       </FormControl>
+
+      { !isEmpty(orderBook) && <Table data={orderBook} /> }
       
     </Box>
   )
